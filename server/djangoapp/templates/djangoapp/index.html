@@ -10,14 +10,26 @@
     <link href="https://unpkg.com/bootstrap-table@1.18.2/dist/bootstrap-table.min.css" rel="stylesheet">
     <script src="https://unpkg.com/bootstrap-table@1.18.2/dist/bootstrap-table.min.js"></script>
     <script src="https://unpkg.com/bootstrap-table@1.18.2/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
-
 </head>
 
-    <body>
-    <!-- Remove this line the first time you edit this file -->
-     This is the index page of your Django app!
-    <!--Add a nav bar here -->
-
+    <body>   
+    <!--Add a nav fbar here -->
+        <header>
+            <nav>
+                <ul>
+                    <li>
+                        <a href="/djangoapp/about">About</a>
+                    </li>
+                    <li>
+                        <a href="/djangoapp/contact">Contact us</a>
+                    </li>
+                    <li>Services</li>
+                </ul>
+            </nav>
+        </header>
+        <section>
+            {% block bodyParts %} {% endblock %}
+        </section>
     <!--Add a dealer table here -->
 
     </body>
