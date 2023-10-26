@@ -10,13 +10,24 @@
     <link href="https://unpkg.com/bootstrap-table@1.18.2/dist/bootstrap-table.min.css" rel="stylesheet">
     <script src="https://unpkg.com/bootstrap-table@1.18.2/dist/bootstrap-table.min.js"></script>
     <script src="https://unpkg.com/bootstrap-table@1.18.2/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
+    <style>
+        .devv {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .devv2 {
+            display: flex;
+            margin-top: 2rem;
+        }
+    </style>
 </head>
 
     <body>   
     <!--Add a nav fbar here -->
         <header>
             <nav>
-                <ul>
+                <!-- <ul>
                     <li>
                         <a href="/djangoapp/about">About</a>
                     </li>
@@ -24,7 +35,34 @@
                         <a href="/djangoapp/contact">Contact us</a>
                     </li>
                     <li>Services</li>
-                </ul>
+                </ul> -->
+                {% if not user.is_authenticated %}
+                <div class="devv">
+                    <h1>Dealership Review</h1>
+                    <div>
+                        <form method="post" action="{% url 'djangoapp:login' %}" class="devv2">
+                            {% csrf_token %}
+                            <input type="text" placeholder="example" required  id="username" name="username"/>
+                            <input type="password" placeholder="123**ex" id="password" name="password" required>
+                            <button type="submit">Log in</button>
+                        </form>
+                        <a href="/djangoapp/registration">try registration?</a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="devv">
+                    <h1>Dealership Review</h1>
+                    <div>
+                        <div class="devv2">
+                            <h2>{{username}}</h2>
+                            <form action="{% url 'djangoapp:logout' %}">
+                                <button type="submit">Logout</button>
+                            </form>
+                            
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             </nav>
         </header>
         <section>
