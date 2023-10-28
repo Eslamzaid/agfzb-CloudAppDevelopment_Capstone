@@ -81,16 +81,15 @@ def get_dealer_reviews_from_cf(url, dealer_id):
 
             try:
                 # These values may be missing
-                car_make = review["car_make"]
                 car_model = review["car_model"]
                 car_year = review["car_year"]
                 purchase_date = review["purchase_date"]
 
                 # Creating a review object
-                review_obj = DealerReview(dealership=dealership, id=id, name=name, 
-                                          purchase=purchase, review=review_content, car_make=car_make, 
-                                          car_model=car_model, car_year=car_year, purchase_date=purchase_date,
-                                          sentiment=analyze_review_sentiments(review['review'])
+                review_obj = DealerReview(dealership=dealership, name=name, 
+                                          purchase=purchase, review=review_content,car_model=car_model,
+                                          car_year=car_year, purchase_date=purchase_date,
+                                          sentiment=analyze_review_sentiments(review['review']), id=id
                                           )
 
             except KeyError:
@@ -138,6 +137,10 @@ def analyze_review_sentiments(review_text):
 # Create a `post_request` to make HTTP POST requests
 # e.g., response = requests.post(url, params=kwargs, json=payload)
 def post_request(url, json_payload, **kwargs):
-    response = requests.post(url, params=kwargs, json=json_payload)
-    print(f"With status {status_code}")
+    response = None
+    try:
+        response = requests.post(url, params=kwargs, json=(json_payload))
+    except:
+        print("OH no")
+    print(f"With status {response}")
     return response

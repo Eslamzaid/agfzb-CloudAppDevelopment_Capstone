@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 # from .models import related models
 # from .restapis import related methods
+from .models import *
 from .restapis import *
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
@@ -11,6 +12,7 @@ from datetime import datetime
 import logging
 import json
 import requests
+import random
 
 
 # Get an instance of a logger
@@ -25,8 +27,6 @@ def djangoapp(request):
 
 def about(request):
     return render(request, './djangoapp/tempFiles/about.html')
-# ...
-
 
 # Create a `contact` view to return a static contact page
 def contact(request):
@@ -83,7 +83,6 @@ def registration_request(request):
         else:
             return render(request, './djangoapp/index.html')
 
-
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
     if request.method == "GET":
@@ -95,28 +94,61 @@ def get_dealerships(request):
         # Return a list of dealer short name
         return HttpResponse(dealer_names)
 
-
 # Create a `get_dealer_details` view to render the reviews of a dealer
 def get_dealer_details(request, dealer_id):
-    # if request.method == "GET":
-    #     if not isinstance(dealer_id, int):
-    #         return HttpResponse("Please provide a dealer id")
-    #     url = f"https://eslmzadpc13-5000.theiadocker-3-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/get_reviews?id={dealer_id}"
-    #     callGet = get_dealer_reviews_from_cf(url, dealer_id)
-    #     print(callGet)
-    #     return HttpResponse(callGet)
     if request.method == "GET":
         url = f"https://eslmzadpc13-5000.theiadocker-3-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/get_reviews?id={dealer_id}"
         callGet = get_dealer_reviews_from_cf(url, dealer_id)
         context = {
             "reviews":  callGet, 
-            "dealer_id": dealer_id
+            "dealer_id": dealer_id,
+            "username": request.user.username
         }
         return render(request, 'djangoapp/dealer_details.html', context)
+
 # Create a `add_review` view to submit a review
 def add_review(request, dealer_id):
-    if request.method == "POST":
+    # User must be logged in before posting a review
+    if request.method == "GET":
+        url = f"https://eslmzadpc13-5000.theiadocker-3-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/get_reviews?id={dealer_id}"
+        # Get dealer details from the API
+        context = {
+            "cars": CarModel.objects.all(),
+            "dealer": get_dealer_by_id(url, dealer_id=dealer_id)[0],
+        }
+        return render(request, 'djangoapp/add_review.html', context)
+    
+    elif request.method == "POST":
         if request.user.is_authenticated:
-            # TODO
-        else:
-            return HttpResponse("User is not authorized")
+            form = request.POST
+            review = dict()
+            review["name"] = f"{request.user.username}"
+            review["dealership"] = dealer_id
+            review["review"] = form["content"]
+            car = CarModel.objects.get(pk=form["car"])
+            review['purchase'] = form.get("purchasecheck")
+            review["car_model"] = car.name
+            review['id'] = random.randint(0,1000)
+            review["car_year"] = '2023-10-2023'
+            # If the user bought the car, get the purchase date
+            if form.get("purchasecheck"):
+                review["purchase_date"] = datetime.strptime(form.get("purchasedate"), "%m/%d/%Y").isoformat()
+            else: 
+                review["purchase_date"] = None
+
+            url = "https://eslmzadpc13-5000.theiadocker-3-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/post_review"  # API Cloud Function route
+            print(review)
+            json_payload = json.dumps({'review': review})  # Create a JSON payload that contains the review data
+
+            # Performing a POST request with the review
+            result = post_request(url, json_payload, dealerId=dealer_id)
+            if int(result.status_code) == 200:
+                print("Review posted successfully.")
+
+            # After posting the review the user is redirected back to the dealer details page
+            return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
+
+    else:
+        # If user isn't logged in, redirect to login page
+        print("User must be authenticated before posting a review. Please log in.")
+        return redirect("/djangoapp/login")

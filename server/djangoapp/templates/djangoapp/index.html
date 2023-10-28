@@ -73,6 +73,7 @@
                         <div class="devv2">
                             <h2>{{username}}</h2>
                             <form action="{% url 'djangoapp:logout' %}">
+                                {% csrf_token %}
                                 <button type="submit">Logout</button>
                             </form>
                             

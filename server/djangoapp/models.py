@@ -32,7 +32,7 @@ class CarModel(models.Model):
     ]
     car_type = models.CharField(max_length=100,choices=CAR_CHOICES)
 # - Year (DateField)
-    year = models.DateField()
+    car_year = models.DateField()
 
 # - __str__ method to print a car make object
     def __str__(self):
@@ -65,7 +65,7 @@ class CarDealer:
 
 # <HINT> Create a plain Python class `DealerReview` to hold review data
 class DealerReview:
-    def __init__(self, dealership, name, purchase, review, purchase_date, car_make, car_model, car_year, sentiment, id):
+    def __init__(self, dealership, name, purchase, review, purchase_date,  car_model, car_year, sentiment, id):
         # Dealer dealership
         self.dealership = dealership
         # Dealer name
@@ -77,7 +77,6 @@ class DealerReview:
         # Location purchase_date
         self.purchase_date = purchase_date
         # Location car_make
-        self.car_make = car_make
         # Dealer car_model
         self.car_model = car_model
         # Dealer car_year
