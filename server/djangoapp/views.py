@@ -9,6 +9,7 @@ from django.contrib import messages
 from datetime import datetime
 import logging
 import json
+import requests
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -85,6 +86,9 @@ def registration_request(request):
 def get_dealerships(request):
     context = {}
     if request.method == "GET":
+        response = requests.get('https://eslmzadpc13-3000.theiadocker-3-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/dealerships/get')
+        data = json.loads(response.text)
+        context['dealerships'] = data
         return render(request, 'djangoapp/index.html', context)
 
 

@@ -20,6 +20,23 @@
             display: flex;
             margin-top: 2rem;
         }
+
+        table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 2rem;
+        }
+
+        td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+        }
+
+        tr:nth-child(even) {
+        background-color: #dddddd;
+        }
     </style>
 </head>
 
@@ -69,7 +86,27 @@
             {% block bodyParts %} {% endblock %}
         </section>
     <!--Add a dealer table here -->
+    {% if not user.is_authenticated %}
+    <table>
+        <tr>
+          <th>ID</th>
+          <th>Dealer name</th>
+          <th>City</th>
+          <th>Address</th>
+          <th>State</th>
+        </tr>
 
+        {% for dealer in dealerships %}
+        <tr>
+            <td>{{ dealer.id }}</td>
+            <td>{{ dealer.full_name }}</td>
+            <td>{{ dealer.city }}</td>
+            <td>{{ dealer.address }}</td>
+            <td>{{ dealer.state }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
     </body>
 
 </html>
